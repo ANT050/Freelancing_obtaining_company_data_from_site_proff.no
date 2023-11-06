@@ -16,17 +16,21 @@ async def get_company_data(url: str, session: ClientSession) -> dict:
     soup = BeautifulSoup(response, 'lxml')
 
     company_name = soup.find(class_="header-wrap clear")
+    company_ceo = soup.find('li', string='Daglig leder:')
     company_phone = soup.find(class_="tel addax addax-cs_ip_phone_click icon ss-phone")
     company_mobile_phone = soup.find(class_="tel addax addax-cs_ip_phone_click icon ss-cell")
-    company_address = soup.find(class_="map-address")
+    company_address = soup.find('li', string='Adresse:')
+    company_postal_address = soup.find('li', string='Postadresse:')
     company_mail = soup.find(class_="addax addax-cs_ip_email_click icon ss-mail")
     company_website = soup.find(class_="addax addax-cs_ip_homepage_url_click icon ss-globe")
 
     data = {
         'company_name': company_name.find('h1').text if company_name else '',
+        'company_ceo': company_ceo.find('span').text if company_ceo else '',
         'company_phone': company_phone.text if company_phone else '',
         'company_mobile_phone': company_mobile_phone.text if company_mobile_phone else '',
         'company_address': company_address.find("span").text if company_address else '',
+        'company_postal_address': company_postal_address.find('span').text if company_postal_address else '',
         'company_mail': company_mail.find('span').text if company_mail else '',
         'company_website': company_website.text if company_website else ''
     }
@@ -66,9 +70,11 @@ def write_to_excel(data: list, filename: str) -> None:
     df = pd.DataFrame(data)
     df.columns = [
         'company_name',
+        'company_ceo',
         'company_phone',
         'company_mobile_phone',
         'company_address',
+        'company_postal_address',
         'company_mail',
         'company_website'
     ]
