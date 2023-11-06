@@ -16,11 +16,11 @@ async def get_company_data(url: str, session: ClientSession) -> dict:
     soup = BeautifulSoup(response, 'lxml')
 
     company_name = soup.find(class_="header-wrap clear")
-    company_ceo = soup.find('li', string='Daglig leder:')
+    company_ceo = soup.select_one('li:has(> em:-soup-contains("Daglig leder:"))')
     company_phone = soup.find(class_="tel addax addax-cs_ip_phone_click icon ss-phone")
     company_mobile_phone = soup.find(class_="tel addax addax-cs_ip_phone_click icon ss-cell")
-    company_address = soup.find('li', string='Adresse:')
-    company_postal_address = soup.find('li', string='Postadresse:')
+    company_address = soup.select_one('ul.content.definition-list li:has(> em:-soup-contains("Adresse:"))')
+    company_postal_address = soup.select_one('ul.content.definition-list li:has(> em:-soup-contains("Postadresse:"))')
     company_mail = soup.find(class_="addax addax-cs_ip_email_click icon ss-mail")
     company_website = soup.find(class_="addax addax-cs_ip_homepage_url_click icon ss-globe")
 
@@ -34,7 +34,7 @@ async def get_company_data(url: str, session: ClientSession) -> dict:
         'company_mail': company_mail.find('span').text if company_mail else '',
         'company_website': company_website.text if company_website else ''
     }
-
+    print(data)
     return data
 
 
