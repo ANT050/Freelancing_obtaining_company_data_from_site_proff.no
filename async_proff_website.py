@@ -34,7 +34,7 @@ async def get_company_data(url: str, session: ClientSession) -> dict:
         'company_mail': company_mail.find('span').text if company_mail else '',
         'company_website': company_website.text if company_website else ''
     }
-    
+
     return data
 
 
