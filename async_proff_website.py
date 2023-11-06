@@ -1,8 +1,9 @@
-import json
+# import json
 import aiohttp
 import asyncio
 from aiohttp import ClientSession
 from bs4 import BeautifulSoup
+import pandas as pd
 
 
 async def fetch_html_content(url: str, session: ClientSession) -> str:
@@ -33,11 +34,6 @@ async def get_company_data(url: str, session: ClientSession) -> dict:
     return data
 
 
-def write_to_json(data: list, filename: str) -> None:
-    with open(filename, 'w', encoding='utf-8') as json_file:
-        json.dump(data, json_file, ensure_ascii=False, indent=4)
-
-
 async def extract_and_save_company_data(base_url: str, headers: dict) -> list:
     async with aiohttp.ClientSession(headers=headers) as session:
         current_url = base_url
@@ -65,6 +61,26 @@ async def extract_and_save_company_data(base_url: str, headers: dict) -> list:
         return all_companies_data
 
 
+# Сохранение данных в Excel файл
+def write_to_excel(data: list, filename: str) -> None:
+    df = pd.DataFrame(data)
+    df.columns = [
+        'company_name',
+        'company_phone',
+        'company_mobile_phone',
+        'company_address',
+        'company_mail',
+        'company_website'
+    ]
+    df.to_excel(filename, index=False, engine='openpyxl')
+
+
+# Сохранение данных в файл
+# def write_to_json(data: list, filename: str) -> None:
+#     with open(filename, 'w', encoding='utf-8') as json_file:
+#         json.dump(data, json_file, ensure_ascii=False, indent=4)
+
+
 def main():
     base_url = 'https://www.proff.no/bransjes%C3%B8k?q=Entrepren%C3%B8rer'
     headers = {
@@ -75,7 +91,8 @@ def main():
     }
 
     data = asyncio.run(extract_and_save_company_data(base_url, headers))
-    write_to_json(data, 'companies_data.json')
+    write_to_excel(data, 'companies_data.xlsx')
+    # write_to_json(data, 'companies_data.json')
 
 
 if __name__ == '__main__':
